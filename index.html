@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        function Person(name,age,long){
+            this.name=name,
+            this.age=age,
+            this.long=long,
+            this.do_=function (){
+                console.log(this.name+"今年"+this.age+"岁会"+this.long)
+            }
+        }
+        var value_1=prompt("输入名字:")
+        var value_2=parseInt(prompt("输入年龄:"))
+        var value_3=prompt("输入技能:")
+        var a_1=new Person(value_1,value_2,value_3)
+        a_1.do_()
+    </script>
+</body>
+</html>
