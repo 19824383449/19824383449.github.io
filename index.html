@@ -1,25 +1,313 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>计划本</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #f5ecd7;
+      font-family: "Microsoft YaHei", sans-serif;
+      padding: 24px 0;
+    }
+
+    .all {
+      width: 90%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* ===== 头部表单区 ===== */
+    .submit {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .form_title,
+    .form_plan {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form_plan {
+      align-items: flex-start;
+      margin-top: 12px;
+    }
+
+    .form_title input {
+      flex: 1;
+      height: 36px;
+      padding: 0 10px;
+      font-size: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .form_plan textarea {
+      flex: 1;
+      height: 80px;
+      padding: 8px 10px;
+      font-size: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      resize: vertical;
+    }
+
+    .form_title input:focus,
+    .form_plan textarea:focus {
+      outline: none;
+      border-color: #6bc6d4;
+    }
+
+    .submit button[type="submit"] {
+      display: block;
+      margin: 16px 0 0 auto;
+      padding: 8px 28px;
+      background: #6bc6d4;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .submit button[type="submit"]:hover {
+      background: #55b4c2;
+    }
+
+    /* ===== 计划卡片 ===== */
+    .value {
+      background-color: #fff;
+      border-left: 6px solid #6bc6d4;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+      padding: 16px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .title .check-btn {
+      width: 22px;
+      height: 22px;
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      background: #f0f0f0;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      line-height: 1;
+      color: #999;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+    }
+
+    .title #title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      flex: 1;
+      /* 占满中间，把删除按钮推到最右 */
+    }
+
+    /* ===== 垃圾桶删除按钮 ===== */
+    .delete-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #bbb;
+      /* SVG 用 currentColor 上色 */
+      transition: color .2s, background .2s;
+      flex-shrink: 0;
+    }
+
+    .delete-btn:hover {
+      color: #e74c3c;
+      background: #fdecea;
+    }
+
+    .delete-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .value .text {
+      font-size: 15px;
+      color: #666;
+      line-height: 1.6;
+      margin: 0 0 24px;
+      max-height: 70px;
+      overflow: hidden;
+    }
+
+    #time {
+      position: absolute;
+      right: 16px;
+      bottom: 12px;
+      font-size: 12px;
+      color: #aaa;
+    }
+  </style>
 </head>
+
 <body>
-    <script>
-        function Person(name,age,long){
-            this.name=name,
-            this.age=age,
-            this.long=long,
-            this.do_=function (){
-                console.log(this.name+"今年"+this.age+"岁会"+this.long)
-            }
-        }
-        var value_1=prompt("输入名字:")
-        var value_2=parseInt(prompt("输入年龄:"))
-        var value_3=prompt("输入技能:")
-        var a_1=new Person(value_1,value_2,value_3)
-        a_1.do_()
-    </script>
+  <div class="all">
+
+    <!-- 头部：计划输入表单 -->
+    <div class="submit">
+      <form>
+        <div class="form_title">
+          <label>标题:</label>
+          <input type="text" placeholder="请输入标题">
+        </div>
+        <div class="form_plan">
+          <label>计划:</label>
+          <textarea placeholder="请输入计划内容"></textarea>
+        </div>
+        <button type="submit">添加</button>
+      </form>
+    </div>
+
+    <!-- 计划卡片 -->
+    <div class="plan_body">
+      <div class="value" data-id="">
+        <div class="title">
+          <button class="check-btn"></button>
+          <span id="title">暂无信息</span>
+          <!-- 垃圾桶删除按钮 -->
+          <button class="delete-btn" title="删除" aria-label="删除这条计划">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6
+                   m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="text">　　去制定计划吧</div>
+        <span id="time">1111年11月11日</span>
+      </div>
+    </div>
+
+  </div>
 </body>
+<script src="https://static.cloudbase.net/cloudbase-js-sdk/2.17.5/cloudbase.full.js"></script>
+<script>
+  const app = cloudbase.init({ env: 'protective-kiwi-d7fnfflf75b12f9d' });
+  const db = app.database();
+  async function init() {
+    const auth = app.auth();
+    if (!auth.hasLoginState()) await auth.signInAnonymously(); // 必须登录后才能读写
+  }
+  init();
+</script>
+
+<script>
+  //获取元素
+  //获取添加按钮
+  const sub_button = document.querySelector("button[type='submit']")
+  //定义值
+  const value = function (title, plan, time, over) {
+    this.title = title
+    this.plan = plan
+    this.time = time
+    this.over = over
+  }
+  //全部数据获取函数
+  async function arr_read() {
+    const json = await db.collection('data').limit(100).get();
+    const data = json.data;
+    if (data.length == 0) {
+      return [{ "title": " ", "plan": " ", "time": "", "over": false, "_id": 0, "_openid": 0 }]
+    }
+    return data
+  }
+  //数据保存函数
+  async function arr_save(arr) {
+    const r = await db.collection('data').add(arr);
+    return id = r._id;
+  }
+  //渲染所有数据函数
+  function see_arr(arr) {
+    const plan_body = document.querySelector(".plan_body")
+    const html_arr = arr.map(function (item, index, array) {
+      let but_true="none"
+      let but_false="block"  
+      if(item.over){
+        but_true="block"
+        but_false="none"
+      }
+      return `
+      <div class="value" data-id="${item._id}">
+        <div class="title">
+          <button class="check-btn" style="display: ${but_true};">✅</button>
+          <button class="check-btn" style="display: ${but_false};">❌</button>
+          <span id="title">${item.title}</span>
+          <!-- 垃圾桶删除按钮 -->
+          <button class="delete-btn" title="删除" aria-label="删除这条计划">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6
+                    m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="text">&nbsp;&nbsp;&nbsp;&nbsp;${item.plan}</div>
+      <span id="time">${item.time}</span>
+      </div>
+      `
+    })
+    plan_body.innerHTML = html_arr.join("\n")
+  }
+  //获取全部数据渲染
+  arr_read().then(list => { see_arr(list) })
+  //添加按钮事件
+  sub_button.addEventListener("click", async function (e) {
+    e.preventDefault()
+    const title = document.querySelector("input[type='text']")
+    const plan = document.querySelector("textarea")
+    const date = new Date()
+    const time = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
+    if (title.value == "" || plan.value == "") {
+      return 0
+    }
+    const data = new value(title.value, plan.value, time, false)
+    await arr_save(data)
+    plan.value = ""
+    title.value = ""
+  })
+
+</script>
+
 </html>
